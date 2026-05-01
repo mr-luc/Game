@@ -1,0 +1,108 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0d1620;
+  color: #ecf3fb;
+  text-align: center;
+}
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 10px;
+}
+h1 {
+  margin: 8px 0 4px;
+  font-size: 26px;
+}
+.sub {
+  margin: 0 0 8px;
+  font-size: 14px;
+  opacity: .9;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 6px 0;
+}
+button, input {
+  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 2px solid #1d2a38;
+}
+button {
+  font-weight: 700;
+  background: #f8fbff;
+  color: #102030;
+}
+input {
+  min-width: 260px;
+}
+#status {
+  min-height: 44px;
+  margin: 6px auto;
+  max-width: 860px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,.08);
+  border-radius: 12px;
+}
+#qrcode {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+#qrcode canvas,
+#qrcode img {
+  background: white;
+  padding: 10px;
+  border-radius: 16px;
+}
+.join-link {
+  color: #d7e9ff;
+  word-break: break-all;
+}
+#gameWrap {
+  width: min(96vw, 920px);
+  margin: 0 auto;
+  position: relative;
+}
+#game {
+  width: 100%;
+  height: min(68vh, 700px);
+  display: block;
+  border-radius: 20px;
+  border: 3px solid #233548;
+  background: #091118;
+  box-shadow: 0 18px 40px rgba(0,0,0,.35);
+}
+#overlay {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  background: rgba(13,22,32,.66);
+  color: white;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 14px;
+  backdrop-filter: blur(5px);
+}
+#controls {
+  margin-top: 10px;
+}
+#controls button {
+  width: 82px;
+  height: 56px;
+  font-size: 24px;
+}
+.hint {
+  font-size: 13px;
+  opacity: .85;
+  margin-top: 6px;
+}
