@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Vater & Sohn Koop-Test</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -20,19 +19,11 @@
       -webkit-user-select: none;
     }
 
-    h1 {
-      font-size: 24px;
-      margin: 16px 8px 8px;
-    }
+    h1 { font-size: 24px; margin: 16px 8px 8px; }
 
-    .panel {
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 10px;
-    }
+    .panel { max-width: 520px; margin: 0 auto; padding: 10px; }
 
-    button,
-    input {
+    button, input {
       font-size: 17px;
       padding: 11px 14px;
       margin: 5px;
@@ -41,15 +32,9 @@
       background: white;
     }
 
-    button {
-      font-weight: 700;
-      cursor: pointer;
-    }
+    button { font-weight: 700; cursor: pointer; }
 
-    input {
-      width: min(90vw, 320px);
-      text-align: center;
-    }
+    input { width: min(90vw, 320px); text-align: center; }
 
     #status {
       min-height: 48px;
@@ -57,7 +42,22 @@
       font-size: 16px;
     }
 
-    canvas {
+    #qrcode {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 8px auto 12px;
+      min-height: 0;
+    }
+
+    #qrcode canvas, #qrcode img {
+      background: white;
+      padding: 10px;
+      border-radius: 14px;
+      border: 2px solid #172033;
+    }
+
+    canvas#game {
       width: min(92vw, 420px);
       height: min(92vw, 420px);
       max-height: 48vh;
@@ -67,9 +67,7 @@
       touch-action: none;
     }
 
-    #controls {
-      margin: 10px auto 18px;
-    }
+    #controls { margin: 10px auto 18px; }
 
     #controls button {
       width: 78px;
@@ -95,6 +93,7 @@
     <button id="joinButton">Ich bin Sohn / Verbinden</button>
 
     <p id="status">Noch nicht verbunden.</p>
+    <div id="qrcode"></div>
 
     <canvas id="game" width="420" height="420"></canvas>
 
@@ -109,7 +108,7 @@
 
     <div class="small">
       Vater = blauer Kreis · Sohn = oranges Dreieck<br />
-      Auf iPad 1 Host starten, ID auf iPad 2 eingeben.
+      Auf iPad 1 Host starten, QR-Code mit iPad 2 scannen.
     </div>
   </div>
 
@@ -117,6 +116,7 @@
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
     const statusText = document.getElementById("status");
+    const qrContainer = document.getElementById("qrcode");
     const hostButton = document.getElementById("hostButton");
     const joinButton = document.getElementById("joinButton");
     const peerIdInput = document.getElementById("peerIdInput");
@@ -131,7 +131,7 @@
     };
 
     hostButton.addEventListener("click", startHost);
-    joinButton.addEventListener("click", joinGame);
+    joinButton.addEventListener("click", () => joinGame());
 
     document.querySelectorAll("#controls button").forEach(button => {
       button.addEventListener("click", () => {
@@ -147,13 +147,32 @@
       if (key === "arrowright" || key === "d") move(12, 0);
     });
 
+    window.addEventListener("load", () => {
+      const params = new URLSearchParams(window.location.search);
+      const joinId = params.get("join");
+      if (joinId) {
+        peerIdInput.value = joinId;
+        setTimeout(() => joinGame(joinId), 500);
+      }
+    });
+
     function startHost() {
       role = "father";
+      qrContainer.innerHTML = "";
       statusText.textContent = "Host wird gestartet ...";
       peer = new Peer();
 
       peer.on("open", id => {
-        statusText.innerHTML = "Host-ID: <b>" + id + "</b><br>Diese ID auf dem zweiten iPad eingeben.";
+        const cleanUrl = window.location.href.split("?")[0];
+        const joinUrl = cleanUrl + "?join=" + encodeURIComponent(id);
+        statusText.innerHTML = "Host-ID: <b>" + id + "</b><br>QR-Code mit dem zweiten iPad scannen.";
+        qrContainer.innerHTML = "";
+        new QRCode(qrContainer, {
+          text: joinUrl,
+          width: 190,
+          height: 190,
+          correctLevel: QRCode.CorrectLevel.M
+        });
       });
 
       peer.on("connection", connection => {
@@ -166,14 +185,15 @@
       });
     }
 
-    function joinGame() {
-      const hostId = peerIdInput.value.trim();
+    function joinGame(optionalHostId) {
+      const hostId = optionalHostId || peerIdInput.value.trim();
       if (!hostId) {
-        statusText.textContent = "Bitte zuerst die Host-ID eingeben.";
+        statusText.textContent = "Bitte zuerst die Host-ID eingeben oder QR-Code scannen.";
         return;
       }
 
       role = "son";
+      qrContainer.innerHTML = "";
       statusText.textContent = "Verbinde mit Host ...";
       peer = new Peer();
 
@@ -189,6 +209,7 @@
 
     function setupConnection() {
       conn.on("open", () => {
+        qrContainer.innerHTML = "";
         statusText.textContent = "Verbunden! Bewegt eure Figuren.";
         sendState();
       });
@@ -226,10 +247,7 @@
 
     function sendState() {
       if (conn && conn.open) {
-        conn.send({
-          type: "state",
-          players: players
-        });
+        conn.send({ type: "state", players: players });
       }
     }
 
@@ -241,14 +259,8 @@
       ctx.strokeStyle = "#e2e8f0";
       ctx.lineWidth = 1;
       for (let i = 0; i <= canvas.width; i += 42) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, canvas.height);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(0, i);
-        ctx.lineTo(canvas.width, i);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
       }
     }
 
