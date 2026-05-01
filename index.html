@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Vater & Sohn Koop - Level 1</title>
+  <title>Vater & Sohn Koop – 2.5D</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
@@ -11,26 +11,57 @@
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #eef2f7;
-      color: #172033;
+      background: linear-gradient(180deg, #dde8f4 0%, #edf3f8 100%);
+      color: #162132;
       text-align: center;
       user-select: none;
       -webkit-user-select: none;
     }
-    h1 { font-size: 24px; margin: 16px 8px 4px; }
-    .mission { font-weight: 700; margin: 0 8px 8px; }
-    .panel { max-width: 520px; margin: 0 auto; padding: 10px; }
+    .panel {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+    h1 {
+      font-size: 25px;
+      margin: 10px 8px 4px;
+    }
+    .mission {
+      margin: 0 12px 10px;
+      font-weight: 700;
+      font-size: 15px;
+    }
     button, input {
       font-size: 17px;
       padding: 11px 14px;
       margin: 5px;
-      border-radius: 12px;
-      border: 2px solid #172033;
+      border-radius: 14px;
+      border: 2px solid #162132;
       background: white;
     }
-    button { font-weight: 700; cursor: pointer; }
-    input { width: min(90vw, 320px); text-align: center; }
-    #status { min-height: 48px; padding: 8px; font-size: 16px; }
+    button {
+      font-weight: 700;
+      cursor: pointer;
+    }
+    input {
+      width: min(90vw, 320px);
+      text-align: center;
+    }
+    #status {
+      min-height: 48px;
+      padding: 8px;
+      font-size: 16px;
+    }
+    .top-actions {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    #resetButton {
+      background: #fff7ed;
+    }
     #qrcode {
       display: none;
       justify-content: center;
@@ -44,7 +75,7 @@
       background: white;
       padding: 10px;
       border-radius: 14px;
-      border: 2px solid #172033;
+      border: 2px solid #162132;
       width: 210px;
       height: 210px;
     }
@@ -52,55 +83,66 @@
       display: block;
       font-size: 14px;
       word-break: break-all;
-      color: #172033;
+      color: #162132;
       max-width: 92vw;
     }
     canvas#game {
-      width: min(92vw, 420px);
-      height: min(92vw, 420px);
-      max-height: 48vh;
-      background: #ffffff;
-      border: 4px solid #172033;
+      width: min(95vw, 520px);
+      height: auto;
+      max-height: 58vh;
+      background: linear-gradient(180deg, #dceafd 0%, #ffffff 55%);
+      border: 4px solid #162132;
       border-radius: 18px;
       touch-action: none;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
     }
-    #controls { margin: 10px auto 18px; }
+    #controls {
+      margin: 12px auto 18px;
+    }
     #controls button {
-      width: 78px;
+      width: 82px;
       height: 58px;
       font-size: 26px;
       background: #ffffff;
     }
-    .small { font-size: 14px; opacity: 0.8; margin-top: 4px; }
+    .small {
+      font-size: 14px;
+      opacity: 0.82;
+      margin-top: 2px;
+    }
   </style>
 </head>
 <body>
   <div class="panel">
-    <h1>Vater & Sohn Koop</h1>
-    <p class="mission">Level 1: Beide Schalter drücken → Tür öffnet → gemeinsam ins Ziel!</p>
+    <h1>Vater & Sohn Koop – 2.5D</h1>
+    <p class="mission">Level 1: Beide Schalter aktivieren → Tor öffnen → gemeinsam auf die goldene Zielplattform!</p>
 
-    <button id="hostButton">Ich bin Vater / Host</button>
-    <br />
-    <input id="peerIdInput" placeholder="Host-ID vom Vater eingeben" autocomplete="off" />
-    <button id="joinButton">Ich bin Sohn / Verbinden</button>
+    <div class="top-actions">
+      <button id="hostButton">Ich bin Vater / Host</button>
+      <button id="resetButton">Level neu starten</button>
+    </div>
+    <div>
+      <input id="peerIdInput" placeholder="Host-ID vom Vater eingeben" autocomplete="off" />
+      <button id="joinButton">Ich bin Sohn / Verbinden</button>
+    </div>
 
     <p id="status">Noch nicht verbunden.</p>
     <div id="qrcode"></div>
 
-    <canvas id="game" width="420" height="420"></canvas>
+    <canvas id="game" width="520" height="460"></canvas>
 
     <div id="controls">
-      <div><button data-dx="0" data-dy="-12">⬆️</button></div>
+      <div><button data-dx="0" data-dy="-14">⬆️</button></div>
       <div>
-        <button data-dx="-12" data-dy="0">⬅️</button>
-        <button data-dx="12" data-dy="0">➡️</button>
+        <button data-dx="-14" data-dy="0">⬅️</button>
+        <button data-dx="14" data-dy="0">➡️</button>
       </div>
-      <div><button data-dx="0" data-dy="12">⬇️</button></div>
+      <div><button data-dx="0" data-dy="14">⬇️</button></div>
     </div>
 
     <div class="small">
-      Vater = blauer Kreis · Sohn = oranges Dreieck<br />
-      Der rote Balken ist die Tür. Sie öffnet sich nur bei Teamarbeit.
+      Vater = blauer Zylinder · Sohn = orange Pyramide<br />
+      Das rote Tor blockiert den Weg, bis beide gleichzeitig auf ihren Feldern stehen.
     </div>
   </div>
 
@@ -111,6 +153,7 @@
     const qrContainer = document.getElementById("qrcode");
     const hostButton = document.getElementById("hostButton");
     const joinButton = document.getElementById("joinButton");
+    const resetButton = document.getElementById("resetButton");
     const peerIdInput = document.getElementById("peerIdInput");
 
     let peer = null;
@@ -118,20 +161,43 @@
     let role = "";
     let levelDone = false;
 
+    const world = {
+      width: 340,
+      height: 280,
+      originX: 260,
+      originY: 82,
+      scaleX: 1.05,
+      scaleY: 0.56
+    };
+
+    const startPositions = {
+      father: { x: 55, y: 222 },
+      son: { x: 100, y: 222 }
+    };
+
     const players = {
-      father: { x: 70, y: 330 },
-      son: { x: 120, y: 330 }
+      father: { ...startPositions.father },
+      son: { ...startPositions.son }
     };
 
     const level = {
-      fatherSwitch: { x: 80, y: 95, r: 25 },
-      sonSwitch: { x: 340, y: 95, r: 25 },
-      door: { x: 185, y: 185, w: 50, h: 110 },
-      goal: { x: 302, y: 300, w: 82, h: 72 }
+      fatherSwitch: { x: 58, y: 58, w: 42, h: 42 },
+      sonSwitch: { x: 240, y: 58, w: 42, h: 42 },
+      door: { x: 145, y: 108, w: 50, h: 76 },
+      goal: { x: 225, y: 200, w: 72, h: 52 },
+      blocks: [
+        { x: 0, y: 0, w: 340, h: 10 },
+        { x: 0, y: 0, w: 10, h: 280 },
+        { x: 330, y: 0, w: 10, h: 280 },
+        { x: 0, y: 270, w: 340, h: 10 },
+        { x: 116, y: 124, w: 24, h: 112 },
+        { x: 201, y: 124, w: 24, h: 112 }
+      ]
     };
 
     hostButton.addEventListener("click", startHost);
     joinButton.addEventListener("click", () => joinGame());
+    resetButton.addEventListener("click", resetLevel);
 
     document.querySelectorAll("#controls button").forEach(button => {
       button.addEventListener("click", () => move(Number(button.dataset.dx), Number(button.dataset.dy)));
@@ -139,10 +205,10 @@
 
     window.addEventListener("keydown", event => {
       const key = event.key.toLowerCase();
-      if (key === "arrowup" || key === "w") move(0, -12);
-      if (key === "arrowdown" || key === "s") move(0, 12);
-      if (key === "arrowleft" || key === "a") move(-12, 0);
-      if (key === "arrowright" || key === "d") move(12, 0);
+      if (key === "arrowup" || key === "w") move(0, -14);
+      if (key === "arrowdown" || key === "s") move(0, 14);
+      if (key === "arrowleft" || key === "a") move(-14, 0);
+      if (key === "arrowright" || key === "d") move(14, 0);
     });
 
     window.addEventListener("load", () => {
@@ -152,6 +218,7 @@
         peerIdInput.value = joinId;
         setTimeout(() => joinGame(joinId), 500);
       }
+      draw();
     });
 
     function startHost() {
@@ -183,7 +250,12 @@
       qrContainer.style.display = "flex";
       try {
         if (window.QRCode) {
-          new QRCode(qrContainer, { text: joinUrl, width: 190, height: 190, correctLevel: QRCode.CorrectLevel.M });
+          new QRCode(qrContainer, {
+            text: joinUrl,
+            width: 190,
+            height: 190,
+            correctLevel: QRCode.CorrectLevel.M
+          });
         } else {
           throw new Error("QRCode library not loaded");
         }
@@ -224,7 +296,7 @@
       conn.on("open", () => {
         qrContainer.innerHTML = "";
         qrContainer.style.display = "none";
-        statusText.textContent = "Verbunden! Beide auf die Schalter, dann gemeinsam ins Ziel.";
+        statusText.textContent = "Verbunden! Aktiviert beide Schalter und lauft dann ins Ziel.";
         sendState();
       });
       conn.on("data", data => {
@@ -239,25 +311,45 @@
       conn.on("error", () => { statusText.textContent = "Verbindungsfehler."; });
     }
 
+    function resetLevel() {
+      players.father = { ...startPositions.father };
+      players.son = { ...startPositions.son };
+      levelDone = false;
+      statusText.textContent = conn && conn.open
+        ? "Level neu gestartet. Wieder beide Schalter aktivieren!"
+        : "Level neu gestartet.";
+      draw();
+      sendState();
+    }
+
     function move(dx, dy) {
       if (!role) {
         statusText.textContent = "Starte zuerst als Vater oder verbinde dich als Sohn.";
         return;
       }
+
+      if (levelDone) {
+        statusText.textContent = "Level schon geschafft – nutze 'Level neu starten'.";
+        return;
+      }
+
       const player = role === "father" ? players.father : players.son;
       const oldX = player.x;
       const oldY = player.y;
-      player.x = clamp(player.x + dx, 24, canvas.width - 24);
-      player.y = clamp(player.y + dy, 28, canvas.height - 28);
 
-      if (!isDoorOpen() && collidesWithDoor(player)) {
+      player.x = clamp(player.x + dx, 18, world.width - 18);
+      player.y = clamp(player.y + dy, 18, world.height - 18);
+
+      if (hitsSolid(player)) {
         player.x = oldX;
         player.y = oldY;
       }
 
       if (bothPlayersInGoal()) {
         levelDone = true;
-        statusText.textContent = "Level geschafft! Ihr seid beide im Ziel.";
+        statusText.textContent = "Level geschafft! Sehr stark – ihr habt es gemeinsam gelöst.";
+      } else if (isDoorOpen()) {
+        statusText.textContent = "Tor offen! Jetzt gemeinsam auf die Zielplattform.";
       }
 
       draw();
@@ -265,141 +357,283 @@
     }
 
     function sendState() {
-      if (conn && conn.open) conn.send({ type: "state", players: players, levelDone: levelDone });
-    }
-
-    function isOnSwitch(player, sw) {
-      const dx = player.x - sw.x;
-      const dy = player.y - sw.y;
-      return Math.sqrt(dx * dx + dy * dy) < sw.r + 16;
-    }
-
-    function isDoorOpen() {
-      return isOnSwitch(players.father, level.fatherSwitch) && isOnSwitch(players.son, level.sonSwitch);
-    }
-
-    function collidesWithDoor(player) {
-      const d = level.door;
-      return player.x + 20 > d.x && player.x - 20 < d.x + d.w && player.y + 20 > d.y && player.y - 20 < d.y + d.h;
-    }
-
-    function isInGoal(player) {
-      const g = level.goal;
-      return player.x > g.x && player.x < g.x + g.w && player.y > g.y && player.y < g.y + g.h;
-    }
-
-    function bothPlayersInGoal() {
-      return isInGoal(players.father) && isInGoal(players.son);
+      if (conn && conn.open) {
+        conn.send({ type: "state", players: players, levelDone: levelDone });
+      }
     }
 
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
     }
 
-    function drawGrid() {
-      ctx.strokeStyle = "#e2e8f0";
-      ctx.lineWidth = 1;
-      for (let i = 0; i <= canvas.width; i += 42) {
-        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+    function playerRect(player) {
+      return { x: player.x - 14, y: player.y - 14, w: 28, h: 28 };
+    }
+
+    function rectsOverlap(a, b) {
+      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    }
+
+    function isOnSwitch(player, sw) {
+      return rectsOverlap(playerRect(player), sw);
+    }
+
+    function isDoorOpen() {
+      return isOnSwitch(players.father, level.fatherSwitch) && isOnSwitch(players.son, level.sonSwitch);
+    }
+
+    function hitsSolid(player) {
+      const pRect = playerRect(player);
+      for (const block of level.blocks) {
+        if (rectsOverlap(pRect, block)) return true;
+      }
+      if (!isDoorOpen() && rectsOverlap(pRect, level.door)) return true;
+      return false;
+    }
+
+    function isInGoal(player) {
+      return rectsOverlap(playerRect(player), level.goal);
+    }
+
+    function bothPlayersInGoal() {
+      return isInGoal(players.father) && isInGoal(players.son);
+    }
+
+    function iso(x, y, z = 0) {
+      return {
+        x: world.originX + (x - y) * world.scaleX,
+        y: world.originY + (x + y) * world.scaleY - z
+      };
+    }
+
+    function drawIsoTile(x, y, w, h, topColor, leftColor, rightColor, height = 0, stroke = "#22304a") {
+      const p1 = iso(x, y, height);
+      const p2 = iso(x + w, y, height);
+      const p3 = iso(x + w, y + h, height);
+      const p4 = iso(x, y + h, height);
+      const p1b = iso(x, y, 0);
+      const p2b = iso(x + w, y, 0);
+      const p3b = iso(x + w, y + h, 0);
+      const p4b = iso(x, y + h, 0);
+
+      if (height > 0) {
+        ctx.beginPath();
+        ctx.moveTo(p4.x, p4.y);
+        ctx.lineTo(p3.x, p3.y);
+        ctx.lineTo(p3b.x, p3b.y);
+        ctx.lineTo(p4b.x, p4b.y);
+        ctx.closePath();
+        ctx.fillStyle = rightColor;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p4.x, p4.y);
+        ctx.lineTo(p4b.x, p4b.y);
+        ctx.lineTo(p1b.x, p1b.y);
+        ctx.closePath();
+        ctx.fillStyle = leftColor;
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.lineTo(p4.x, p4.y);
+      ctx.closePath();
+      ctx.fillStyle = topColor;
+      ctx.fill();
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function drawFloor() {
+      drawIsoTile(0, 0, world.width, world.height, "#d8e6c8", "#bdd09d", "#a9c086", 0);
+
+      for (let x = 0; x < world.width; x += 34) {
+        for (let y = 0; y < world.height; y += 34) {
+          const p1 = iso(x, y);
+          const p2 = iso(x + 34, y);
+          const p3 = iso(x + 34, y + 34);
+          const p4 = iso(x, y + 34);
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.lineTo(p3.x, p3.y);
+          ctx.lineTo(p4.x, p4.y);
+          ctx.closePath();
+          ctx.strokeStyle = "rgba(22,33,50,0.11)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
       }
     }
 
-    function drawSwitch(sw, label, active) {
-      ctx.beginPath();
-      ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
-      ctx.fillStyle = active ? "#6ee7b7" : "#e5e7eb";
-      ctx.fill();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "#172033";
-      ctx.stroke();
-      ctx.fillStyle = "#172033";
-      ctx.font = "15px system-ui";
-      ctx.fillText(label, sw.x - 28, sw.y + 48);
+    function shade(hex, amount) {
+      const color = hex.replace("#", "");
+      const num = parseInt(color, 16);
+      const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+      const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+      const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+      return `rgb(${r},${g},${b})`;
+    }
+
+    function drawSwitch(sw, label, active, color) {
+      drawIsoTile(sw.x, sw.y, sw.w, sw.h, active ? color : "#d7dde7", active ? shade(color, -30) : "#bbc4d2", active ? shade(color, -15) : "#c7ced9", 10);
+      const p = iso(sw.x + sw.w / 2, sw.y + sw.h / 2, 14);
+      ctx.fillStyle = "#162132";
+      ctx.font = "14px system-ui";
+      ctx.fillText(label, p.x - 22, p.y + 34);
+    }
+
+    function drawBlock(block, colorTop, colorLeft, colorRight, height = 26) {
+      drawIsoTile(block.x, block.y, block.w, block.h, colorTop, colorLeft, colorRight, height);
     }
 
     function drawDoor(open) {
-      const d = level.door;
-      if (open) {
-        ctx.fillStyle = "rgba(110, 231, 183, 0.25)";
-        ctx.fillRect(d.x, d.y, d.w, d.h);
-        ctx.strokeStyle = "#10b981";
-        ctx.strokeRect(d.x, d.y, d.w, d.h);
-        ctx.fillStyle = "#065f46";
-        ctx.fillText("offen", d.x + 3, d.y - 8);
-      } else {
-        ctx.fillStyle = "#ef4444";
-        ctx.fillRect(d.x, d.y, d.w, d.h);
-        ctx.strokeStyle = "#172033";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(d.x, d.y, d.w, d.h);
-        ctx.fillStyle = "#172033";
-        ctx.fillText("Tür", d.x + 10, d.y - 8);
-      }
+      if (open) return;
+      drawIsoTile(level.door.x, level.door.y, level.door.w, level.door.h, "#f87171", "#dc2626", "#ef4444", 42, "#4b1111");
+      const textPos = iso(level.door.x + 12, level.door.y + level.door.h / 2, 50);
+      ctx.fillStyle = "white";
+      ctx.font = "bold 14px system-ui";
+      ctx.fillText("TOR", textPos.x - 4, textPos.y + 4);
     }
 
     function drawGoal() {
-      const g = level.goal;
-      ctx.fillStyle = levelDone ? "#facc15" : "#dbeafe";
-      ctx.fillRect(g.x, g.y, g.w, g.h);
-      ctx.strokeStyle = "#172033";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(g.x, g.y, g.w, g.h);
-      ctx.fillStyle = "#172033";
-      ctx.font = "18px system-ui";
-      ctx.fillText(levelDone ? "GEWINN!" : "ZIEL", g.x + 13, g.y + 42);
+      drawIsoTile(level.goal.x, level.goal.y, level.goal.w, level.goal.h,
+        levelDone ? "#fcd34d" : "#fde68a",
+        levelDone ? "#d97706" : "#f59e0b",
+        levelDone ? "#f59e0b" : "#fbbf24",
+        8);
+      const p = iso(level.goal.x + 14, level.goal.y + 22, 12);
+      ctx.fillStyle = "#162132";
+      ctx.font = "bold 15px system-ui";
+      ctx.fillText(levelDone ? "GEWONNEN" : "ZIEL", p.x, p.y + 4);
+    }
+
+    function drawCylinderPlayer(player, colorMain, colorSide, label) {
+      const base = iso(player.x, player.y);
+      const top = iso(player.x, player.y, 26);
+      ctx.beginPath();
+      ctx.ellipse(base.x, base.y + 2, 17, 9, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,0.18)";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(base.x - 14, base.y);
+      ctx.lineTo(top.x - 14, top.y);
+      ctx.quadraticCurveTo(top.x, top.y + 6, top.x + 14, top.y);
+      ctx.lineTo(base.x + 14, base.y);
+      ctx.quadraticCurveTo(base.x, base.y + 8, base.x - 14, base.y);
+      ctx.closePath();
+      ctx.fillStyle = colorSide;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(top.x, top.y, 14, 8, 0, 0, Math.PI * 2);
+      ctx.fillStyle = colorMain;
+      ctx.fill();
+      ctx.strokeStyle = "#162132";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = "#162132";
+      ctx.font = "14px system-ui";
+      ctx.fillText(label, top.x - 18, top.y - 16);
+    }
+
+    function drawPyramidPlayer(player, colorMain, colorLeft, colorRight, label) {
+      const base = iso(player.x, player.y);
+      const apex = iso(player.x, player.y, 34);
+      const left = iso(player.x - 12, player.y + 10, 0);
+      const right = iso(player.x + 12, player.y + 10, 0);
+      const front = iso(player.x, player.y + 22, 0);
+
+      ctx.beginPath();
+      ctx.ellipse(base.x, base.y + 4, 17, 9, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,0.18)";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(apex.x, apex.y);
+      ctx.lineTo(left.x, left.y);
+      ctx.lineTo(front.x, front.y);
+      ctx.closePath();
+      ctx.fillStyle = colorLeft;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(apex.x, apex.y);
+      ctx.lineTo(front.x, front.y);
+      ctx.lineTo(right.x, right.y);
+      ctx.closePath();
+      ctx.fillStyle = colorRight;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(apex.x, apex.y);
+      ctx.lineTo(left.x, left.y);
+      ctx.lineTo(right.x, right.y);
+      ctx.closePath();
+      ctx.fillStyle = colorMain;
+      ctx.fill();
+      ctx.strokeStyle = "#162132";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = "#162132";
+      ctx.font = "14px system-ui";
+      ctx.fillText(label, apex.x - 16, apex.y - 16);
+    }
+
+    function drawHudText() {
+      ctx.fillStyle = "rgba(255,255,255,0.72)";
+      ctx.fillRect(15, 12, 490, 38);
+      ctx.strokeStyle = "rgba(22,33,50,0.2)";
+      ctx.strokeRect(15, 12, 490, 38);
+      ctx.fillStyle = "#162132";
+      ctx.font = "bold 16px system-ui";
+      let text = "Beide Schalter gleichzeitig aktivieren!";
+      if (isDoorOpen() && !levelDone) text = "Tor offen! Jetzt gemeinsam zur goldenen Plattform.";
+      if (levelDone) text = "Geschafft! Nutzt 'Level neu starten' für eine neue Runde.";
+      ctx.fillText(text, 26, 36);
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawGrid();
+
       const fatherOn = isOnSwitch(players.father, level.fatherSwitch);
       const sonOn = isOnSwitch(players.son, level.sonSwitch);
-      const open = isDoorOpen();
+      const doorOpen = isDoorOpen();
 
-      drawSwitch(level.fatherSwitch, "Vater", fatherOn);
-      drawSwitch(level.sonSwitch, "Sohn", sonOn);
+      drawFloor();
+      drawSwitch(level.fatherSwitch, "Vater", fatherOn, "#60a5fa");
+      drawSwitch(level.sonSwitch, "Sohn", sonOn, "#fb923c");
       drawGoal();
-      drawDoor(open);
 
-      ctx.fillStyle = "#172033";
-      ctx.font = "15px system-ui";
-      ctx.fillText(open ? "Tür offen! Lauft beide ins Ziel." : "Beide Schalter gleichzeitig drücken!", 80, 30);
+      for (const block of level.blocks) {
+        drawBlock(block, "#cbd5e1", "#94a3b8", "#a8b5c6", 24);
+      }
 
-      drawFather(players.father.x, players.father.y);
-      drawSon(players.son.x, players.son.y);
+      drawDoor(doorOpen);
+
+      const entities = [
+        { type: "father", depth: players.father.x + players.father.y },
+        { type: "son", depth: players.son.x + players.son.y }
+      ].sort((a, b) => a.depth - b.depth);
+
+      for (const entity of entities) {
+        if (entity.type === "father") {
+          drawCylinderPlayer(players.father, "#3b82f6", "#1d4ed8", "Vater");
+        } else {
+          drawPyramidPlayer(players.son, "#fb923c", "#ea580c", "#f97316", "Sohn");
+        }
+      }
+
+      drawHudText();
     }
-
-    function drawFather(x, y) {
-      ctx.beginPath();
-      ctx.arc(x, y, 22, 0, Math.PI * 2);
-      ctx.fillStyle = "#2b6cff";
-      ctx.fill();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "#172033";
-      ctx.stroke();
-      ctx.fillStyle = "#172033";
-      ctx.font = "16px system-ui";
-      ctx.fillText("Vater", x - 22, y - 32);
-    }
-
-    function drawSon(x, y) {
-      ctx.beginPath();
-      ctx.moveTo(x, y - 28);
-      ctx.lineTo(x - 25, y + 22);
-      ctx.lineTo(x + 25, y + 22);
-      ctx.closePath();
-      ctx.fillStyle = "#ff9f1c";
-      ctx.fill();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "#172033";
-      ctx.stroke();
-      ctx.fillStyle = "#172033";
-      ctx.font = "16px system-ui";
-      ctx.fillText("Sohn", x - 19, y + 42);
-    }
-
-    draw();
   </script>
 </body>
 </html>
