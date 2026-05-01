@@ -20,7 +20,6 @@
     }
 
     h1 { font-size: 24px; margin: 16px 8px 8px; }
-
     .panel { max-width: 520px; margin: 0 auto; padding: 10px; }
 
     button, input {
@@ -33,7 +32,6 @@
     }
 
     button { font-weight: 700; cursor: pointer; }
-
     input { width: min(90vw, 320px); text-align: center; }
 
     #status {
@@ -43,11 +41,13 @@
     }
 
     #qrcode {
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       margin: 8px auto 12px;
-      min-height: 0;
+      min-height: 220px;
+      flex-direction: column;
+      gap: 8px;
     }
 
     #qrcode canvas, #qrcode img {
@@ -55,6 +55,16 @@
       padding: 10px;
       border-radius: 14px;
       border: 2px solid #172033;
+      width: 210px;
+      height: 210px;
+    }
+
+    .join-link {
+      display: block;
+      font-size: 14px;
+      word-break: break-all;
+      color: #172033;
+      max-width: 92vw;
     }
 
     canvas#game {
@@ -134,9 +144,7 @@
     joinButton.addEventListener("click", () => joinGame());
 
     document.querySelectorAll("#controls button").forEach(button => {
-      button.addEventListener("click", () => {
-        move(Number(button.dataset.dx), Number(button.dataset.dy));
-      });
+      button.addEventListener("click", () => move(Number(button.dataset.dx), Number(button.dataset.dy)));
     });
 
     window.addEventListener("keydown", event => {
@@ -159,6 +167,7 @@
     function startHost() {
       role = "father";
       qrContainer.innerHTML = "";
+      qrContainer.style.display = "none";
       statusText.textContent = "Host wird gestartet ...";
       peer = new Peer();
 
@@ -166,13 +175,7 @@
         const cleanUrl = window.location.href.split("?")[0];
         const joinUrl = cleanUrl + "?join=" + encodeURIComponent(id);
         statusText.innerHTML = "Host-ID: <b>" + id + "</b><br>QR-Code mit dem zweiten iPad scannen.";
-        qrContainer.innerHTML = "";
-        new QRCode(qrContainer, {
-          text: joinUrl,
-          width: 190,
-          height: 190,
-          correctLevel: QRCode.CorrectLevel.M
-        });
+        showQrCode(joinUrl);
       });
 
       peer.on("connection", connection => {
@@ -185,6 +188,35 @@
       });
     }
 
+    function showQrCode(joinUrl) {
+      qrContainer.innerHTML = "";
+      qrContainer.style.display = "flex";
+
+      try {
+        if (window.QRCode) {
+          new QRCode(qrContainer, {
+            text: joinUrl,
+            width: 190,
+            height: 190,
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } else {
+          throw new Error("QRCode library not loaded");
+        }
+      } catch (error) {
+        const img = document.createElement("img");
+        img.alt = "QR-Code zum Verbinden";
+        img.src = "https://api.qrserver.com/v1/create-qr-code/?size=210x210&data=" + encodeURIComponent(joinUrl);
+        qrContainer.appendChild(img);
+      }
+
+      const link = document.createElement("a");
+      link.className = "join-link";
+      link.href = joinUrl;
+      link.textContent = "Falls der Scan nicht klappt: Link antippen/kopieren";
+      qrContainer.appendChild(link);
+    }
+
     function joinGame(optionalHostId) {
       const hostId = optionalHostId || peerIdInput.value.trim();
       if (!hostId) {
@@ -194,6 +226,7 @@
 
       role = "son";
       qrContainer.innerHTML = "";
+      qrContainer.style.display = "none";
       statusText.textContent = "Verbinde mit Host ...";
       peer = new Peer();
 
@@ -210,6 +243,7 @@
     function setupConnection() {
       conn.on("open", () => {
         qrContainer.innerHTML = "";
+        qrContainer.style.display = "none";
         statusText.textContent = "Verbunden! Bewegt eure Figuren.";
         sendState();
       });
@@ -222,13 +256,8 @@
         }
       });
 
-      conn.on("close", () => {
-        statusText.textContent = "Verbindung getrennt.";
-      });
-
-      conn.on("error", () => {
-        statusText.textContent = "Verbindungsfehler.";
-      });
+      conn.on("close", () => { statusText.textContent = "Verbindung getrennt."; });
+      conn.on("error", () => { statusText.textContent = "Verbindungsfehler."; });
     }
 
     function move(dx, dy) {
@@ -240,15 +269,12 @@
       const player = role === "father" ? players.father : players.son;
       player.x = clamp(player.x + dx, 24, canvas.width - 24);
       player.y = clamp(player.y + dy, 28, canvas.height - 28);
-
       draw();
       sendState();
     }
 
     function sendState() {
-      if (conn && conn.open) {
-        conn.send({ type: "state", players: players });
-      }
+      if (conn && conn.open) conn.send({ type: "state", players: players });
     }
 
     function clamp(value, min, max) {
@@ -267,7 +293,6 @@
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawGrid();
-
       ctx.fillStyle = "#f8fafc";
       ctx.fillRect(160, 175, 100, 70);
       ctx.strokeStyle = "#172033";
@@ -276,7 +301,6 @@
       ctx.fillStyle = "#172033";
       ctx.font = "18px system-ui";
       ctx.fillText("Treffpunkt", 168, 215);
-
       drawFather(players.father.x, players.father.y);
       drawSon(players.son.x, players.son.y);
     }
